@@ -163,9 +163,13 @@ function App() {
 
       <SearchBar searchTerm = {searchTerm} onSearch = {setSearchTerm}/>
 
-      <div className="customer-list">
-        <h2>Customers ({filteredCustomers.length})</h2>
-
+      {filteredCustomers.length === 0 ? (
+        <p className="empty-state">
+          {searchTerm
+            ? "No customers match your search."
+            : "No customers yet. Add one above!"}
+        </p>
+      ) : (
         <div className="customers">
           {filteredCustomers.map((customer) => (
             <CustomerCard
@@ -175,7 +179,7 @@ function App() {
             />
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }

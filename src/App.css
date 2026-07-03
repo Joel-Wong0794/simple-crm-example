@@ -105,3 +105,10 @@
   color: var(--primary-700);
   font-weight: var(--weight-medium);
 }
+
+/* src/App.css */
+.empty-state {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  padding: var(--space-6) 0;
+}
