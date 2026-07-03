@@ -170,8 +170,13 @@ function App() {
           <SearchBar searchTerm={searchTerm} onSearch={setSearchTerm} />
 
           <div className="customer-list">
-            <h2>Customers ({filteredCustomers.length})</h2>
-
+            <h2>
+              Customers (
+              {searchTerm
+                ? `Showing ${filteredCustomers.length} of ${customers.length}`
+                : customers.length}
+              )
+            </h2>
             {filteredCustomers.length === 0 ? (
               <p className="empty-state">
                 {searchTerm
