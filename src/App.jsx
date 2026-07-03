@@ -2,13 +2,21 @@ import { useState } from "react";
 import { mockCustomers, generateCustomerId } from "./mockData";
 import "./App.css";
 import CustomerCard from "./components/CustomerCard";
+// src/App.jsx (add this import at the top)
+import SearchBar from "./components/SearchBar";
 
 function App() {
   const [customers, setCustomers] = useState(mockCustomers);
   const ALL_TAGS = ["VIP", "Lead", "Referral"];
-  // const [firstName, setFirstName] = useState("");
-  // const [lastName, setLastName] = useState("");
-  // const [email, setEmail] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Derived: computed on every render, always in sync
+  const filteredCustomers = customers.filter(
+    (c) =>
+      c.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.email.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   // Use an object to manage form state
   const [form, setForm] = useState({
@@ -153,11 +161,13 @@ function App() {
         </button>
       </form>
 
+      <SearchBar searchTerm = {searchTerm} onSearch = {setSearchTerm}/>
+
       <div className="customer-list">
-        <h2>Customers ({customers.length})</h2>
+        <h2>Customers ({filteredCustomers.length})</h2>
 
         <div className="customers">
-          {customers.map((customer) => (
+          {filteredCustomers.map((customer) => (
             <CustomerCard
               key={customer.id}
               customer={customer}
