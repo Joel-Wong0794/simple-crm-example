@@ -135,3 +135,8 @@
   background: var(--danger-500);
   color: var(--text-on-primary);
 }
+
+.cardSelected {
+  border-color: var(--primary-500);
+  box-shadow: var(--shadow-md), 0 0 0 2px var(--primary-100);
+}

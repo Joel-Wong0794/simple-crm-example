@@ -1,37 +1,36 @@
 import { useState } from "react";
+
 import { mockCustomers, generateCustomerId } from "./mockData";
-import "./App.css";
 import CustomerCard from "./components/CustomerCard";
-// src/App.jsx (add this import at the top)
 import SearchBar from "./components/SearchBar";
+import "./App.css";
+import CustomerDetail from "./components/CustomerDetail";
+
+const ALL_TAGS = ["VIP", "Lead", "Referral"];
+
+const initialFormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  tags: [],
+  status: "active",
+};
 
 function App() {
   const [customers, setCustomers] = useState(mockCustomers);
-  const ALL_TAGS = ["VIP", "Lead", "Referral"];
+  const [form, setForm] = useState(initialFormState);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  // Derived: computed on every render, always in sync
-  const filteredCustomers = customers.filter(
-    (c) =>
-      c.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.email.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredCustomers = customers.filter((c) =>
+    c.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  // Use an object to manage form state
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    tags: [],
-    status: "active",
-  });
-
   const handleChange = (e) => {
-
     // if(e.target.name === "firstName") {
     //   if(e.target.value === "a") alert("name cannot have a")
     // }
+
     setForm((prev) => {
       // [e.target.name] will evaluate to become "firstName", "lastName"
       const updatedCopy = { ...prev, [e.target.name]: e.target.value };
@@ -39,11 +38,11 @@ function App() {
     });
   };
 
-  // function handleDeleteCustomer
   const handleDeleteCustomer = (customerId) => {
-    // Returns a new array with the customer with customerId filtered out
     setCustomers(customers.filter((c) => c.id !== customerId));
-    // can also updater function
+    if (selectedCustomer?.id === customerId) {
+      setSelectedCustomer(null);
+    }
   };
 
   const handleTagToggle = (tag) => {
@@ -71,9 +70,10 @@ function App() {
       createdAt: new Date().toISOString().slice(0, 10),
     };
 
+    // Add new customer to the customers list
     setCustomers([...customers, newCustomer]);
-    setForm({ firstName: "", lastName: "", email: "", tags: [] });
-      };
+    setForm(initialFormState);
+  };
 
   return (
     <div className="simple-crm">
@@ -89,9 +89,7 @@ function App() {
             name="firstName"
             type="text"
             placeholder="e.g. Sarah"
-            // value={firstName}
             value={form.firstName}
-            // onChange={(e) => setFirstName(e.target.value)}
             onChange={handleChange}
             required
           />
@@ -104,9 +102,7 @@ function App() {
             name="lastName"
             type="text"
             placeholder="e.g. Chen"
-            // value={lastName}
             value={form.lastName}
-            // onChange={(e) => setLastName(e.target.value)}
             onChange={handleChange}
             required
           />
@@ -161,25 +157,37 @@ function App() {
         </button>
       </form>
 
-      <SearchBar searchTerm = {searchTerm} onSearch = {setSearchTerm}/>
+      <div className="crm-layout">
+        <div className="customer-panel">
+          <SearchBar searchTerm={searchTerm} onSearch={setSearchTerm} />
 
-      {filteredCustomers.length === 0 ? (
-        <p className="empty-state">
-          {searchTerm
-            ? "No customers match your search."
-            : "No customers yet. Add one above!"}
-        </p>
-      ) : (
-        <div className="customers">
-          {filteredCustomers.map((customer) => (
-            <CustomerCard
-              key={customer.id}
-              customer={customer}
-              onDelete={handleDeleteCustomer}
-            />
-          ))}
+          <div className="customer-list">
+            <h2>Customers ({filteredCustomers.length})</h2>
+
+            {filteredCustomers.length === 0 ? (
+              <p className="empty-state">
+                {searchTerm
+                  ? "No customers match your search."
+                  : "No customers yet. Add one above!"}
+              </p>
+            ) : (
+              <div className="customers">
+                {filteredCustomers.map((customer) => (
+                  <CustomerCard
+                    key={customer.id}
+                    customer={customer}
+                    onDelete={handleDeleteCustomer}
+                    onSelect={setSelectedCustomer}
+                    isSelected={selectedCustomer?.id === customer.id}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+
+        <CustomerDetail customer={selectedCustomer} />
+      </div>
     </div>
   );
 }
