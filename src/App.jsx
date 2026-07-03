@@ -17,6 +17,7 @@ const initialFormState = {
 };
 
 function App() {
+  const [showForm, setShowForm] = useState(false)
   const [customers, setCustomers] = useState(mockCustomers);
   const [form, setForm] = useState(initialFormState);
   const [searchTerm, setSearchTerm] = useState("");
@@ -78,7 +79,14 @@ function App() {
   return (
     <div className="simple-crm">
       <h1>Simple CRM</h1>
+      <button
+        className="toggle-form-btn"
+        onClick={() => setShowForm(!showForm)}
+      >
+        {showForm ? "Cancel" : "Add Customer"}
+      </button>
 
+    {showForm && (
       <form onSubmit={handleAddCustomer} className="add-customer-form">
         <h3>Add New Customer</h3>
 
@@ -156,7 +164,7 @@ function App() {
           Add Customer
         </button>
       </form>
-
+    )}
       <div className="crm-layout">
         <div className="customer-panel">
           <SearchBar searchTerm={searchTerm} onSearch={setSearchTerm} />

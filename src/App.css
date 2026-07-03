@@ -112,3 +112,21 @@
   font-size: var(--text-sm);
   padding: var(--space-6) 0;
 }
+
+.toggle-form-btn {
+  padding: var(--space-2) var(--space-5);
+  background: var(--action-primary);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  margin-bottom: var(--space-6);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.toggle-form-btn:hover {
+  background: var(--action-primary-hover);
+}
