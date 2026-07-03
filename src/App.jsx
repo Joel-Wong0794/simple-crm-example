@@ -26,6 +26,9 @@ function App() {
   const filteredCustomers = customers.filter((c) =>
     c.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+  const activeCustomerCount = customers.filter((c) =>
+    c.status == "active",
+  ).length;
 
   const handleChange = (e) => {
     // if(e.target.name === "firstName") {
@@ -175,7 +178,7 @@ function App() {
               {searchTerm
                 ? `Showing ${filteredCustomers.length} of ${customers.length}`
                 : customers.length}
-              )
+              ) - {activeCustomerCount} Total Active Customers
             </h2>
             {filteredCustomers.length === 0 ? (
               <p className="empty-state">
