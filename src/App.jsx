@@ -171,7 +171,7 @@ function App() {
       <div className="crm-layout">
         <div className="customer-panel">
           <SearchBar searchTerm={searchTerm} onSearch={setSearchTerm} />
-
+          <CustomerDetail customer={selectedCustomer} />
           <div className="customer-list">
             <h2>
               Customers (
@@ -201,8 +201,6 @@ function App() {
             )}
           </div>
         </div>
-
-        <CustomerDetail customer={selectedCustomer} />
       </div>
     </div>
   );
