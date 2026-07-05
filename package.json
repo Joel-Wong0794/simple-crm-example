@@ -25,5 +25,9 @@
     "globals": "^17.7.0",
     "json-server": "^1.0.0-beta.15",
     "vite": "^8.1.1"
-  }
+  },
+  "scripts": {
+  "dev": "vite",
+  "server": "json-server --watch data/db.json --port 3001"
+}
 }
