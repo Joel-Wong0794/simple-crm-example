@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-import { generateCustomerId } from "./mockData";
 import CustomerCard from "./components/CustomerCard";
 import SearchBar from "./components/SearchBar";
 import "./App.css";
@@ -27,6 +26,7 @@ function App() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const filteredCustomers = customers.filter((c) =>
     c.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -40,7 +40,7 @@ function App() {
     setLoading(true);
     try{
       // fake delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const response = await fetch(`${API_BASE}/customers`);
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
@@ -85,11 +85,11 @@ function App() {
     }));
   };
 
-  const handleAddCustomer = (e) => {
+  const handleAddCustomer = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
 
     const newCustomer = {
-      id: generateCustomerId(),
       firstName: form.firstName,
       lastName: form.lastName,
       email: form.email,
@@ -101,9 +101,27 @@ function App() {
       createdAt: new Date().toISOString().slice(0, 10),
     };
 
-    // Add new customer to the customers list
-    setCustomers([...customers, newCustomer]);
-    setForm(initialFormState);
+    try {
+      const response = await fetch(`${API_BASE}/customers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCustomer),
+      });
+      // fake delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error(`Failed to add customer: ${response.status}`);
+      }
+
+      const created = await response.json();
+      setCustomers([...customers, created]);
+      setForm({ firstName: "", lastName: "", email: "", tags: [], status: "active" });
+      setShowForm(false);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) return <Spinner />;
@@ -193,8 +211,8 @@ function App() {
           </select>
         </div>
 
-        <button type="submit" className="submit-button">
-          Add Customer
+        <button type="submit" className="submit-button" disabled={submitting}>
+          {submitting ? "Adding..." : "Add Customer"}
         </button>
       </form>
     )}
