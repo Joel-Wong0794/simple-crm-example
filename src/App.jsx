@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import { mockCustomers, generateCustomerId } from "./mockData";
+import { generateCustomerId } from "./mockData";
 import CustomerCard from "./components/CustomerCard";
 import SearchBar from "./components/SearchBar";
 import "./App.css";
 import CustomerDetail from "./components/CustomerDetail";
+import Spinner from "./components/Spinner";
 
 const ALL_TAGS = ["VIP", "Lead", "Referral"];
 
@@ -16,12 +17,16 @@ const initialFormState = {
   status: "active",
 };
 
+export const API_BASE = "http://localhost:3001";
+
 function App() {
   const [showForm, setShowForm] = useState(false)
-  const [customers, setCustomers] = useState(mockCustomers);
+  const [customers, setCustomers] = useState([]);
   const [form, setForm] = useState(initialFormState);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const filteredCustomers = customers.filter((c) =>
     c.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -29,6 +34,28 @@ function App() {
   const activeCustomerCount = customers.filter((c) =>
     c.status == "active",
   ).length;
+
+  useEffect(() => {
+    const loadCustomers = async () => {
+    setLoading(true);
+    try{
+      // fake delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await fetch(`${API_BASE}/customers`);
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      const data = await response.json();
+      setCustomers(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+        setLoading(false)
+      }
+    };
+
+    loadCustomers();
+  }, []); // empty array: run once on mount
 
   const handleChange = (e) => {
     // if(e.target.name === "firstName") {
@@ -78,6 +105,9 @@ function App() {
     setCustomers([...customers, newCustomer]);
     setForm(initialFormState);
   };
+
+  if (loading) return <Spinner />;
+  if (error)   return <p className="status-message error">Error: {error}</p>;
 
   return (
     <div className="simple-crm">

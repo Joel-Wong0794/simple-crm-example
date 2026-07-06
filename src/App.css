@@ -130,3 +130,16 @@
 .toggle-form-btn:hover {
   background: var(--action-primary-hover);
 }
+
+.status-message {
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.status-message.error {
+  color: var(--danger-600);
+  background: var(--danger-50, #f9eeed);
+  border: 1px solid var(--danger-100, #f1d6d3);
+}
