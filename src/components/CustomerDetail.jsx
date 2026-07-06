@@ -1,12 +1,60 @@
-// src/components/CustomerDetail.jsx
+import { useState, useEffect } from "react";
+import { API_BASE } from "../App";
 import styles from "./CustomerDetail.module.css";
+import Spinner from "./Spinner";
 
-function CustomerDetail({ customer }) {
+function CustomerDetail({ selectedId }) {
+  const [customer, setCustomer] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!selectedId) return;
+
+    const fetchCustomer = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const response = await fetch(`${API_BASE}/customers/${selectedId}`);
+
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setCustomer(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomer();
+  }, [selectedId]);
+
   // Conditional rendering
-  if (!customer) {
+  if (!selectedId) {
     return (
       <div className={styles.panel}>
         <p className={styles.empty}>Select a customer to view details.</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.panel}>
+        <p className={styles.empty}>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (loading || !customer) {
+    return (
+      <div className={styles.panel}>
+        <Spinner size={8} />
       </div>
     );
   }

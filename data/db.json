@@ -1,21 +1,6 @@
 {
   "customers": [
     {
-      "id": "c1",
-      "firstName": "Sarah",
-      "lastName": "Chen",
-      "email": "sarah.chen@email.com",
-      "phone": "+65 9123 4567",
-      "status": "active",
-      "tags": [
-        "VIP",
-        "Referral"
-      ],
-      "company": "Fintech Pte Ltd",
-      "notes": "Referred by Marcus. Interested in the enterprise plan.",
-      "createdAt": "2024-03-12"
-    },
-    {
       "id": "c2",
       "firstName": "James",
       "lastName": "Tan",
@@ -40,21 +25,6 @@
       "company": "Gov Agency",
       "notes": "",
       "createdAt": "2024-01-20"
-    },
-    {
-      "id": "c4",
-      "firstName": "Marcus",
-      "lastName": "Lim",
-      "email": "marcus.lim@email.com",
-      "phone": "+65 9456 7890",
-      "status": "active",
-      "tags": [
-        "Lead",
-        "VIP"
-      ],
-      "company": "RetailX Pte Ltd",
-      "notes": "High-value account. Has requested a custom SLA.",
-      "createdAt": "2023-11-05"
     },
     {
       "id": "c5",

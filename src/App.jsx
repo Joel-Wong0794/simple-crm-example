@@ -19,43 +19,49 @@ const initialFormState = {
 export const API_BASE = "http://localhost:3001";
 
 function App() {
-  const [showForm, setShowForm] = useState(false)
   const [customers, setCustomers] = useState([]);
   const [form, setForm] = useState(initialFormState);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  // Derived states
+  // whenever value can be computed from existing state, always use derive state
+  const activeCount = customers.filter((c) => c.status === "active").length;
 
   const filteredCustomers = customers.filter((c) =>
     c.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-  const activeCustomerCount = customers.filter((c) =>
-    c.status == "active",
-  ).length;
 
   useEffect(() => {
     const loadCustomers = async () => {
-    setLoading(true);
-    try{
-      // fake delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const response = await fetch(`${API_BASE}/customers`);
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-      const data = await response.json();
-      setCustomers(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-        setLoading(false)
+      setLoading(true);
+      try {
+        // fake delay
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const response = await fetch(`${API_BASE}/customers`);
+
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setCustomers(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadCustomers();
   }, []); // empty array: run once on mount
+
+  // loadCustomers();
 
   const handleChange = (e) => {
     // if(e.target.name === "firstName") {
@@ -79,10 +85,17 @@ function App() {
         throw new Error(`Failed to delete customer: ${response.status}`);
       }
 
+      // server - 10 custs, delete 1, delete 2 = 7
+      // client - 10 custs, delete 1 = 9
+      // this code will never be reach if error thrown above
       setCustomers(customers.filter((c) => c.id !== customerId));
+      // loadCustomers();
 
-      if (selectedCustomer?.id === customerId) {
-        setSelectedCustomer(null);
+      // if (selectedCustomer?.id === customerId) {
+      //   setSelectedCustomer(null);
+      // }
+      if (selectedId === customerId) {
+        setSelectedId(null);
       }
     } catch (err) {
       alert(err.message);
@@ -115,20 +128,26 @@ function App() {
     };
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const response = await fetch(`${API_BASE}/customers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCustomer),
       });
-      // fake delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       if (!response.ok) {
         throw new Error(`Failed to add customer: ${response.status}`);
       }
 
       const created = await response.json();
       setCustomers([...customers, created]);
-      setForm({ firstName: "", lastName: "", email: "", tags: [], status: "active" });
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        tags: [],
+        status: "active",
+      });
       setShowForm(false);
     } catch (err) {
       alert(err.message);
@@ -138,109 +157,108 @@ function App() {
   };
 
   if (loading) return <Spinner />;
-  if (error)   return <p className="status-message error">Error: {error}</p>;
+  if (error) return <p className="status-message error">Error: {error}</p>;
 
   return (
     <div className="simple-crm">
       <h1>Simple CRM</h1>
+
       <button
         className="toggle-form-btn"
         onClick={() => setShowForm(!showForm)}
       >
         {showForm ? "Cancel" : "Add Customer"}
       </button>
+      {showForm && (
+        <form onSubmit={handleAddCustomer} className="add-customer-form">
+          <h3>Add New Customer</h3>
 
-    {showForm && (
-      <form onSubmit={handleAddCustomer} className="add-customer-form">
-        <h3>Add New Customer</h3>
-
-        <div className="form-field">
-          <label htmlFor="firstName">First name</label>
-          <input
-            id="firstName"
-            name="firstName"
-            type="text"
-            placeholder="e.g. Sarah"
-            value={form.firstName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="lastName">Last name</label>
-          <input
-            id="lastName"
-            name="lastName"
-            type="text"
-            placeholder="e.g. Chen"
-            value={form.lastName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="e.g. sarah.chen@email.com"
-            // value={email}
-            value={form.email}
-            // onChange={(e) => setEmail(e.target.value)}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-field">
-          <label>Tags</label>
-          <div className="tag-options">
-            {ALL_TAGS.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => handleTagToggle(tag)}
-                className={`tag-toggle${form.tags.includes(tag) ? " tag-toggle-active" : ""}`}
-              >
-                {tag}
-              </button>
-            ))}
+          <div className="form-field">
+            <label htmlFor="firstName">First name</label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              placeholder="e.g. Sarah"
+              value={form.firstName}
+              onChange={handleChange}
+              required
+            />
           </div>
-        </div>
 
-        <div className="form-field">
-          <label htmlFor="status">Status</label>
-          <select
-            id="status"
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+          <div className="form-field">
+            <label htmlFor="lastName">Last name</label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              placeholder="e.g. Chen"
+              value={form.lastName}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button type="submit" className="submit-button" disabled={submitting}>
-          {submitting ? "Adding..." : "Add Customer"}
-        </button>
-      </form>
-    )}
+          <div className="form-field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="e.g. sarah.chen@email.com"
+              // value={email}
+              value={form.email}
+              // onChange={(e) => setEmail(e.target.value)}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-field">
+            <label>Tags</label>
+            <div className="tag-options">
+              {ALL_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleTagToggle(tag)}
+                  className={`tag-toggle${form.tags.includes(tag) ? " tag-toggle-active" : ""}`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <button type="submit" className="submit-button" disabled={submitting}>
+            {submitting ? "Adding..." : "Add Customer"}
+          </button>
+        </form>
+      )}
+
       <div className="crm-layout">
         <div className="customer-panel">
           <SearchBar searchTerm={searchTerm} onSearch={setSearchTerm} />
-          <CustomerDetail customer={selectedCustomer} />
+
           <div className="customer-list">
             <h2>
-              Customers (
-              {searchTerm
-                ? `Showing ${filteredCustomers.length} of ${customers.length}`
-                : customers.length}
-              ) - {activeCustomerCount} Total Active Customers
+              Customers ({filteredCustomers.length} / {customers.length}) -{" "}
+              {activeCount} total active customers
             </h2>
+
             {filteredCustomers.length === 0 ? (
               <p className="empty-state">
                 {searchTerm
@@ -254,14 +272,18 @@ function App() {
                     key={customer.id}
                     customer={customer}
                     onDelete={handleDeleteCustomer}
-                    onSelect={setSelectedCustomer}
-                    isSelected={selectedCustomer?.id === customer.id}
+                    // onSelect={setSelectedCustomer}
+                    // isSelected={selectedCustomer?.id === customer.id}
+                    onSelect={setSelectedId}
+                    isSelected={selectedId === customer.id}
                   />
                 ))}
               </div>
             )}
           </div>
         </div>
+
+        <CustomerDetail selectedId={selectedId} />
       </div>
     </div>
   );

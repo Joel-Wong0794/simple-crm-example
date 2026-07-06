@@ -12,7 +12,7 @@ function CustomerCard({ customer, onDelete, onSelect, isSelected }) {
   return (
     <div
       className={`${styles.card} ${isSelected ? styles.cardSelected : ""}`}
-      onClick={() => onSelect(customer)}
+      onClick={() => onSelect(customer.id)}
     >
       <div className={styles.header}>
         <div className={styles.avatar}>{initials(firstName, lastName)}</div>
