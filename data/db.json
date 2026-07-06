@@ -71,20 +71,6 @@
       "createdAt": "2024-08-19"
     },
     {
-      "firstName": "abc",
-      "lastName": "huang",
-      "email": "huang@gmail.com",
-      "phone": "",
-      "status": "active",
-      "tags": [
-        "VIP"
-      ],
-      "company": "",
-      "notes": "",
-      "createdAt": "2026-07-06",
-      "id": "Lp_0nVG7EGc"
-    },
-    {
       "firstName": "sarah",
       "lastName": "123",
       "email": "123@g.com",

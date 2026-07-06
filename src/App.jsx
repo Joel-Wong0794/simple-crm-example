@@ -69,10 +69,23 @@ function App() {
     });
   };
 
-  const handleDeleteCustomer = (customerId) => {
-    setCustomers(customers.filter((c) => c.id !== customerId));
-    if (selectedCustomer?.id === customerId) {
-      setSelectedCustomer(null);
+  const handleDeleteCustomer = async (customerId) => {
+    try {
+      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete customer: ${response.status}`);
+      }
+
+      setCustomers(customers.filter((c) => c.id !== customerId));
+
+      if (selectedCustomer?.id === customerId) {
+        setSelectedCustomer(null);
+      }
+    } catch (err) {
+      alert(err.message);
     }
   };
 
