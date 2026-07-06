@@ -37,12 +37,33 @@ function App() {
     c.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  const handleUpdateCustomer = async (customerId, updates) => {
+    try {
+      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update customer: ${response.status}`);
+      }
+
+      const updated = await response.json();
+      setCustomers((prev) =>
+        prev.map((c) => (c.id === customerId ? updated : c))
+      );
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   useEffect(() => {
     const loadCustomers = async () => {
       setLoading(true);
       try {
         // fake delay
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         const response = await fetch(`${API_BASE}/customers`);
 
         if (!response.ok) {
@@ -283,7 +304,7 @@ function App() {
           </div>
         </div>
 
-        <CustomerDetail selectedId={selectedId} />
+        <CustomerDetail selectedId={selectedId} onUpdate={handleUpdateCustomer}/>
       </div>
     </div>
   );
