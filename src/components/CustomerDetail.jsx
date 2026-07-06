@@ -11,7 +11,7 @@ function CustomerDetail({ selectedId }) {
   useEffect(() => {
     if (!selectedId) return;
 
-    const fetchCustomer = async () => {
+    const fetchCustomer = async () => {      
       setLoading(true);
       setError(null);
       try {
@@ -23,6 +23,7 @@ function CustomerDetail({ selectedId }) {
         }
 
         const data = await response.json();
+        console.log("fetchCustomer in CustomerDetail - data received", data)
         setCustomer(data);
       } catch (err) {
         setError(err.message);
