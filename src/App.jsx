@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useReducer } from "react";
 
 import CustomerCard from "./components/CustomerCard";
 import SearchBar from "./components/SearchBar";
-import "./App.css";
 import CustomerDetail from "./components/CustomerDetail";
 import Spinner from "./components/Spinner";
-import { useContext } from "react";
+import "./App.css";
 import { AuthContext } from "./contexts/AuthContext";
 import LoginPage from "./components/LoginPage";
 import Header from "./components/Header";
-import "./App.css";
+import { customerReducer, initialState } from "./reducers/customerReducer";
 
 const ALL_TAGS = ["VIP", "Lead", "Referral"];
 
@@ -24,87 +23,49 @@ const initialFormState = {
 export const API_BASE = "http://localhost:3001";
 
 function App() {
-
   const { user } = useContext(AuthContext);
-
-  const [customers, setCustomers] = useState([]);
-  const [form, setForm] = useState(initialFormState);
+  const [state, dispatch] = useReducer(customerReducer, initialState);
+  const { customers, loading, error, submitting, showForm } = state;
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-
-  // Derived states
-  // whenever value can be computed from existing state, always use derive state
+  const [form, setForm] = useState(initialFormState);
   const activeCount = customers.filter((c) => c.status === "active").length;
 
   const filteredCustomers = customers.filter((c) =>
     c.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const handleUpdateCustomer = async (customerId, updates) => {
-    try {
-      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update customer: ${response.status}`);
-      }
-
-      const updated = await response.json();
-      setCustomers((prev) =>
-        prev.map((c) => (c.id === customerId ? updated : c))
-      );
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
   useEffect(() => {
     const loadCustomers = async () => {
-      setLoading(true);
+      dispatch({ type: "FETCH_START" });
       try {
         // fake delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         const response = await fetch(`${API_BASE}/customers`);
-
         if (!response.ok) {
           throw new Error(`Server error: ${response.status}`);
         }
-
         const data = await response.json();
-        setCustomers(data);
+        dispatch({ type: "FETCH_SUCCESS", payload: data });
       } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        dispatch({ type: "FETCH_ERROR", payload: err.message });
       }
     };
 
     loadCustomers();
-  }, []); // empty array: run once on mount
-
-  // loadCustomers();
+  }, []);
 
   const handleChange = (e) => {
-    // if(e.target.name === "firstName") {
-    //   if(e.target.value === "a") alert("name cannot have a")
-    // }
-
     setForm((prev) => {
-      // [e.target.name] will evaluate to become "firstName", "lastName"
       const updatedCopy = { ...prev, [e.target.name]: e.target.value };
       return updatedCopy;
     });
   };
 
   const handleDeleteCustomer = async (customerId) => {
+    if (!window.confirm("Are you sure you want to delete this customer?"))
+      return;
+
     try {
       const response = await fetch(`${API_BASE}/customers/${customerId}`, {
         method: "DELETE",
@@ -114,15 +75,8 @@ function App() {
         throw new Error(`Failed to delete customer: ${response.status}`);
       }
 
-      // server - 10 custs, delete 1, delete 2 = 7
-      // client - 10 custs, delete 1 = 9
-      // this code will never be reach if error thrown above
-      setCustomers(customers.filter((c) => c.id !== customerId));
-      // loadCustomers();
+      dispatch({ type: "DELETE_CUSTOMER", payload: customerId });
 
-      // if (selectedCustomer?.id === customerId) {
-      //   setSelectedCustomer(null);
-      // }
       if (selectedId === customerId) {
         setSelectedId(null);
       }
@@ -142,7 +96,6 @@ function App() {
 
   const handleAddCustomer = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
 
     const newCustomer = {
       firstName: form.firstName,
@@ -156,6 +109,7 @@ function App() {
       createdAt: new Date().toISOString().slice(0, 10),
     };
 
+    dispatch({ type: "ADD_START" });
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       const response = await fetch(`${API_BASE}/customers`, {
@@ -169,7 +123,7 @@ function App() {
       }
 
       const created = await response.json();
-      setCustomers([...customers, created]);
+      dispatch({ type: "ADD_CUSTOMER", payload: created });
       setForm({
         firstName: "",
         lastName: "",
@@ -177,28 +131,41 @@ function App() {
         tags: [],
         status: "active",
       });
-      setShowForm(false);
     } catch (err) {
+      dispatch({ type: "ADD_ERROR" });
       alert(err.message);
-    } finally {
-      setSubmitting(false);
     }
   };
-  
-  if (!user) {
-    return <LoginPage />;
-  }
+
+  const handleUpdateCustomer = async (customerId, updates) => {
+    try {
+      const response = await fetch(`${API_BASE}/customers/${customerId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update customer: ${response.status}`);
+      }
+
+      const updated = await response.json();
+      dispatch({ type: "UPDATE_CUSTOMER", payload: updated });
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  if (!user) return <LoginPage />;
   if (loading) return <Spinner />;
   if (error) return <p className="status-message error">Error: {error}</p>;
 
   return (
     <div className="simple-crm">
       <Header />
-      <h1>Simple CRM</h1>
-
       <button
         className="toggle-form-btn"
-        onClick={() => setShowForm(!showForm)}
+        onClick={() => dispatch({ type: "TOGGLE_FORM" })}
       >
         {showForm ? "Cancel" : "Add Customer"}
       </button>
@@ -239,9 +206,7 @@ function App() {
               name="email"
               type="email"
               placeholder="e.g. sarah.chen@email.com"
-              // value={email}
               value={form.email}
-              // onChange={(e) => setEmail(e.target.value)}
               onChange={handleChange}
               required
             />
@@ -305,8 +270,6 @@ function App() {
                     key={customer.id}
                     customer={customer}
                     onDelete={handleDeleteCustomer}
-                    // onSelect={setSelectedCustomer}
-                    // isSelected={selectedCustomer?.id === customer.id}
                     onSelect={setSelectedId}
                     isSelected={selectedId === customer.id}
                   />
@@ -316,7 +279,10 @@ function App() {
           </div>
         </div>
 
-        <CustomerDetail selectedId={selectedId} onUpdate={handleUpdateCustomer}/>
+        <CustomerDetail
+          selectedId={selectedId}
+          onUpdate={handleUpdateCustomer}
+        />
       </div>
     </div>
   );
