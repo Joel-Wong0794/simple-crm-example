@@ -5,6 +5,11 @@ import SearchBar from "./components/SearchBar";
 import "./App.css";
 import CustomerDetail from "./components/CustomerDetail";
 import Spinner from "./components/Spinner";
+import { useContext } from "react";
+import { AuthContext } from "./contexts/AuthContext";
+import LoginPage from "./components/LoginPage";
+import Header from "./components/Header";
+import "./App.css";
 
 const ALL_TAGS = ["VIP", "Lead", "Referral"];
 
@@ -19,6 +24,9 @@ const initialFormState = {
 export const API_BASE = "http://localhost:3001";
 
 function App() {
+
+  const { user } = useContext(AuthContext);
+
   const [customers, setCustomers] = useState([]);
   const [form, setForm] = useState(initialFormState);
   const [searchTerm, setSearchTerm] = useState("");
@@ -176,12 +184,16 @@ function App() {
       setSubmitting(false);
     }
   };
-
+  
+  if (!user) {
+    return <LoginPage />;
+  }
   if (loading) return <Spinner />;
   if (error) return <p className="status-message error">Error: {error}</p>;
 
   return (
     <div className="simple-crm">
+      <Header />
       <h1>Simple CRM</h1>
 
       <button
