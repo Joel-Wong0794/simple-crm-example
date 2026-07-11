@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 import Spinner from "./Spinner";
 import { API_BASE } from "../App";
 import styles from "./CustomerDetail.module.css";
+import { CustomerContext } from "../contexts/CustomerContext";
 
-function CustomerDetail({ selectedId, onUpdate }) {
+function CustomerDetail({ selectedId }) {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Keep track when user is editing to render the right component
   const [isEditing, setIsEditing] = useState(false);
-  // const [editForm, setEditForm] = useState({});
-  // const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -78,7 +79,6 @@ function CustomerDetail({ selectedId, onUpdate }) {
       {isEditing ? (
         <CustomerEditForm
           customer={customer}
-          onUpdate={onUpdate}
           onDone={handleDone}
         />
       ) : (
@@ -145,7 +145,9 @@ function CustomerView({ customer, onEditClick }) {
   );
 }
 
-function CustomerEditForm({ customer, onUpdate, onDone }) {
+function CustomerEditForm({ customer, onDone }) {
+  const { updateCustomer } = useContext(CustomerContext);
+
   const [editForm, setEditForm] = useState({
     firstName: customer.firstName,
     lastName: customer.lastName,
@@ -166,7 +168,7 @@ function CustomerEditForm({ customer, onUpdate, onDone }) {
     e.preventDefault();
     setSaving(true);
     try {
-      await onUpdate(customer.id, editForm);
+      await updateCustomer(customer.id, editForm);
       onDone(editForm);
     } catch (err) {
       alert(err.message);
