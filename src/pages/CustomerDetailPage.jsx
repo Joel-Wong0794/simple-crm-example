@@ -1,112 +1,122 @@
 // src/pages/CustomerDetailPage.jsx
-import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router";
+import { useState, useEffect,useContext } from "react";
+import {  useParams, useNavigate, Link } from "react-router";
 import { API_BASE } from "../App";
 import Spinner from "../components/Spinner";
 import styles from "./CustomerDetailPage.module.css";
+import { CustomerContext } from "../contexts/CustomerContext";
 
 function CustomerDetailPage() {
-  const { id } = useParams();
+    const { id } = useParams();
 
-  const [customer, setCustomer] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [customer, setCustomer] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    const { deleteCustomer } = useContext(CustomerContext);
+    const handleDelete = async () => {
+    await deleteCustomer(id);
+    navigate("/app/customers");
+    };
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchCustomer = async () => {
-      setLoading(true);
-      setError(null);
-      try {
+        setLoading(true);
+        setError(null);
+        try {
         const response = await fetch(`${API_BASE}/customers/${id}`);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         setCustomer(data);
-      } catch (err) {
+        } catch (err) {
         setError(err.message);
-      } finally {
+        } finally {
         setLoading(false);
-      }
+        }
     };
     fetchCustomer();
-  }, [id]); // re-fetch whenever the id in the URL changes
+    }, [id]); // re-fetch whenever the id in the URL changes
 
-  if (loading) {
+    if (loading) {
     return (
-      <div className={styles.panel}>
+        <div className={styles.panel}>
         <Spinner size={8} />
-      </div>
+        </div>
     );
-  }
+    }
 
-  if (error) {
+    if (error) {
     return (
-      <div className={styles.panel}>
+        <div className={styles.panel}>
         <p className={styles.empty}>Error: {error}</p>
         <Link to="/app/customers">Back to Customers</Link>
-      </div>
+        </div>
     );
-  }
+    }
 
-  return (
+    return (
     <div className={styles.panel}>
-      <Link to="/app/customers" className={styles.backLink}>
+        <Link to="/app/customers" className={styles.backLink}>
         ← Back to Customers
-      </Link>
+        </Link>
 
-      <div className={styles.panelHead}>
+        <div className={styles.panelHead}>
         <div>
-          <h2 className={styles.name}>
+            <h2 className={styles.name}>
             {customer.firstName} {customer.lastName}
-          </h2>
-          {customer.company && (
+            </h2>
+            {customer.company && (
             <p className={styles.company}>{customer.company}</p>
-          )}
+            )}
         </div>
         <Link to={`/app/customers/${id}/edit`} className={styles.editButton}>
-          Edit
+            Edit
         </Link>
-      </div>
+        </div>
 
-      <div>
+        <div>
         <p className={styles.contactRow}>{customer.email}</p>
         {customer.phone && (
-          <p className={styles.contactRow}>{customer.phone}</p>
+            <p className={styles.contactRow}>{customer.phone}</p>
         )}
-      </div>
+        </div>
 
-      <div className={styles.section}>
+        <div className={styles.section}>
         <p className={styles.sectionLabel}>Status and tags</p>
         <div className={styles.tags}>
-          <span
+            <span
             className={`${styles.badge} ${customer.status === "active" ? styles.badgeActive : styles.badgeInactive}`}
-          >
+            >
             {customer.status}
-          </span>
-          {customer.tags.map((tag) => (
-            <span key={tag} className={styles.tag}>
-              {tag}
             </span>
-          ))}
+            {customer.tags.map((tag) => (
+            <span key={tag} className={styles.tag}>
+                {tag}
+            </span>
+            ))}
         </div>
-      </div>
+        </div>
 
-      <div className={styles.section}>
+        <div className={styles.section}>
         <p className={styles.sectionLabel}>Notes</p>
         {customer.notes ? (
-          <p className={styles.notes}>{customer.notes}</p>
+            <p className={styles.notes}>{customer.notes}</p>
         ) : (
-          <p className={styles.notesEmpty}>No notes yet.</p>
+            <p className={styles.notesEmpty}>No notes yet.</p>
         )}
-      </div>
+        </div>
 
-      <div className={styles.section}>
+        <div className={styles.section}>
         <p className={styles.sectionLabel}>Customer since</p>
         <p className={styles.contactRow}>{customer.createdAt}</p>
-      </div>
+        <button className={styles.deleteButton} onClick={handleDelete}>
+        Delete Customer
+        </button>
+        </div>
     </div>
-  );
-}
+    );
+    }
 
 export default CustomerDetailPage;
