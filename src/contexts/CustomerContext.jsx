@@ -1,4 +1,3 @@
-// src/contexts/CustomerContext.jsx
 import { createContext, useReducer, useState, useEffect } from "react";
 import { customerReducer, initialState } from "../reducers/customerReducer";
 import { API_BASE } from "../App";
@@ -39,9 +38,9 @@ export function CustomerProvider({ children }) {
         body: JSON.stringify(customerData),
       });
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
-      const created = await response.json();
-      dispatch({ type: "ADD_CUSTOMER", payload: created });
-      return createdCustomer;
+      const createdCustomer = await response.json();
+      dispatch({ type: "ADD_CUSTOMER", payload: createdCustomer });
+      return createdCustomer; 
     } catch (err) {
       dispatch({ type: "ADD_ERROR" });
       alert(`Failed to add customer: ${err.message}`);
