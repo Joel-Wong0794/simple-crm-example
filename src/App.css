@@ -143,3 +143,28 @@
   background: var(--danger-50, #f9eeed);
   border: 1px solid var(--danger-100, #f1d6d3);
 }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.btn-primary-link {
+  padding: var(--space-2) var(--space-5);
+  background: var(--action-primary);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.btn-primary-link:hover {
+  background: var(--action-primary-hover);
+}

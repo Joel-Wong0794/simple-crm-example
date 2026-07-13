@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import WelcomePage from "./pages/WelcomePage";
 import RootLayout from "./layouts/RootLayout";
+import DashboardPage from "./pages/DashboardPage";
+import CustomersPage from "./pages/CustomersPage";
+import "./App.css";
 
 export const API_BASE = "http://localhost:3001";
 
@@ -17,7 +20,8 @@ function App() {
         {/* Parent Route */}
         <Route path="app" element={<RootLayout />}>
           {/* Child Routes/Nested Routes */}
-          <Route index element={<div>Dashboard coming soon</div>} />
+          <Route index element={<DashboardPage />} />
+          <Route path="customers" element={<CustomersPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

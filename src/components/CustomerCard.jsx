@@ -2,21 +2,19 @@
 import { useContext } from "react";
 import { Mail, Phone } from "lucide-react";
 import { CustomerContext } from "../contexts/CustomerContext";
-import { AuthContext } from "../contexts/AuthContext";
 import styles from "./CustomerCard.module.css";
 
 function initials(firstName, lastName) {
   return (firstName[0] + lastName[0]).toUpperCase();
 }
 
-function CustomerCard({ customer, onSelect, isSelected }) {
+function CustomerCard({ customer, onSelect }) {
   const { deleteCustomer } = useContext(CustomerContext);
-  const { hasRole } = useContext(AuthContext);
   const { firstName, lastName, email, phone, status, tags } = customer;
 
   return (
     <div
-      className={`${styles.card} ${isSelected ? styles.cardSelected : ""}`}
+      className={styles.card}
       onClick={() => onSelect(customer.id)}
     >
       <div className={styles.header}>
@@ -52,17 +50,15 @@ function CustomerCard({ customer, onSelect, isSelected }) {
             </span>
           ))}
         </div>
-        {hasRole("admin") && (
-          <button
-            className={styles.deleteButton}
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteCustomer(customer.id);
-            }}
-          >
-            Delete
-          </button>
-        )}
+        <button
+          className={styles.deleteButton}
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteCustomer(customer.id);
+          }}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
