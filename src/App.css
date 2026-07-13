@@ -168,3 +168,15 @@
 .btn-primary-link:hover {
   background: var(--action-primary-hover);
 }
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--text-strong);
+}

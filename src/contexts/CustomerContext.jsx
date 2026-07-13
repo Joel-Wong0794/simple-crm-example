@@ -41,6 +41,7 @@ export function CustomerProvider({ children }) {
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
       const created = await response.json();
       dispatch({ type: "ADD_CUSTOMER", payload: created });
+      return createdCustomer;
     } catch (err) {
       dispatch({ type: "ADD_ERROR" });
       alert(`Failed to add customer: ${err.message}`);
