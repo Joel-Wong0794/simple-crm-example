@@ -6,6 +6,7 @@ import CustomersPage from "./pages/CustomersPage";
 import "./App.css";
 import NewCustomerPage from "./pages/NewCustomerPage";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
+import EditCustomerPage from "./pages/EditCustomerPage";
 
 export const API_BASE = "http://localhost:3001";
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="customers" element={<CustomersPage />} />
           <Route path="customers/new" element={<NewCustomerPage />} />
           <Route path="customers/:id" element={<CustomerDetailPage />} />
+          <Route path="customers/:id/edit" element={<EditCustomerPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

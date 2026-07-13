@@ -39,6 +39,20 @@
       "company": "HealthTech SG",
       "notes": "Referred by Sarah Chen.",
       "createdAt": "2024-08-19"
+    },
+    {
+      "firstName": "sarah",
+      "lastName": "chen",
+      "email": "sara@gmail.com",
+      "phone": "asdasdas",
+      "status": "inactive",
+      "tags": [
+        "VIP"
+      ],
+      "company": "",
+      "notes": "",
+      "createdAt": "2026-07-13",
+      "id": "PgQw-XQvOuE"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
