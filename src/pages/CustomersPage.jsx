@@ -1,4 +1,3 @@
-// src/pages/CustomersPage.jsx
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import { CustomerContext } from "../contexts/CustomerContext";
@@ -43,7 +42,7 @@ function CustomersPage() {
         ))}
       </div>
 
-      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <SearchBar searchTerm={searchTerm} onSearch={setSearchTerm} />
 
       <div className="customer-list">
         <h2>Customers ({filteredCustomers.length})</h2>
