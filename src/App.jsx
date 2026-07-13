@@ -7,31 +7,33 @@ import "./App.css";
 import NewCustomerPage from "./pages/NewCustomerPage";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
 import EditCustomerPage from "./pages/EditCustomerPage";
+import LoginPage from "./pages/LoginPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const API_BASE = "http://localhost:3001";
 
 function App() {
   return (
     <BrowserRouter>
-      {/* Routes Definition */}
       <Routes>
-        {/* user accesses "/" - root path */}
+        {/* Public */}
         <Route index element={<WelcomePage />} />
-        {/* /login */}
-        <Route path="login" element={<div>Login page coming soon</div>} />
+        <Route path="login" element={<LoginPage />} />
 
-        {/* Parent Route */}
-
-        {/* path /app */}
-        {/* "/"  + "app" = "/app" */}
-        <Route path="app" element={<RootLayout />}>
-          {/* Child Routes/Nested Routes */}
-          <Route index element={<DashboardPage />} />
-          <Route path="customers" element={<CustomersPage />} />
-          <Route path="customers/new" element={<NewCustomerPage />} />
-          <Route path="customers/:id" element={<CustomerDetailPage />} />
-          <Route path="customers/:id/edit" element={<EditCustomerPage />} />
+        {/* Must be logged in */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="app" element={<RootLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="customers/new" element={<NewCustomerPage />} />
+            <Route path="customers/:id" element={<CustomerDetailPage />} />
+            <Route path="customers/:id/edit" element={<EditCustomerPage />} />
+          </Route>
         </Route>
+
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

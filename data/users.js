@@ -3,8 +3,8 @@ export const USERS = [
   {
     id: "u1",
     name: "Jo",
-    email: "daniel@email",
-    password: "pass",
+    email: "daniel@simplesystems.io",
+    password: "password123",
     role: "admin",
   },
   {
