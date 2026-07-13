@@ -3,8 +3,9 @@ import WelcomePage from "./pages/WelcomePage";
 import RootLayout from "./layouts/RootLayout";
 import DashboardPage from "./pages/DashboardPage";
 import CustomersPage from "./pages/CustomersPage";
-import NewCustomerPage from "./pages/NewCustomerPage";
 import "./App.css";
+import NewCustomerPage from "./pages/NewCustomerPage";
+import CustomerDetailPage from "./pages/CustomerDetailPage";
 
 export const API_BASE = "http://localhost:3001";
 
@@ -13,22 +14,22 @@ function App() {
     <BrowserRouter>
       {/* Routes Definition */}
       <Routes>
-        {/* user accesses "/" */}
+        {/* user accesses "/" - root path */}
         <Route index element={<WelcomePage />} />
         {/* /login */}
         <Route path="login" element={<div>Login page coming soon</div>} />
 
         {/* Parent Route */}
+
+        {/* path /app */}
+        {/* "/"  + "app" = "/app" */}
         <Route path="app" element={<RootLayout />}>
           {/* Child Routes/Nested Routes */}
           <Route index element={<DashboardPage />} />
           <Route path="customers" element={<CustomersPage />} />
+          <Route path="customers/new" element={<NewCustomerPage />} />
+          <Route path="customers/:id" element={<CustomerDetailPage />} />
         </Route>
-      <Route path="app" element={<RootLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="customers" element={<CustomersPage />} />
-        <Route path="customers/new" element={<NewCustomerPage />} />
-      </Route>;
       </Routes>
     </BrowserRouter>
   );
