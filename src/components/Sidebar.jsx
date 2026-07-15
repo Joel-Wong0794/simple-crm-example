@@ -1,6 +1,6 @@
 // src/components/Sidebar.jsx
 import { NavLink } from "react-router";
-import { LayoutDashboard, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, LogOut,Package  } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
 // Temporary stand-in for AuthContext's user, replaced in Part 9
@@ -47,6 +47,10 @@ function Sidebar() {
         <NavLink to="/app/customers" className={navLinkClass}>
           <Users size={17} />
           <span>Customers</span>
+        </NavLink>
+        <NavLink to="/app/products" className={navLinkClass}>
+          <Package size={17} />
+          <span>Products</span>
         </NavLink>
       </nav>
 
