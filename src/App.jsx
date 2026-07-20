@@ -17,7 +17,8 @@ import Spinner from "./components/Spinner";
 const ProductsPage = lazy(() => import("./pages/ProductsPage"));
 
 // export const API_BASE = "http://localhost:3001";
-export const API_BASE = "https://6a5e1eaf98d9f02aed792592.mockapi.io";
+// export const API_BASE = "https://6a5e1eaf98d9f02aed792592.mockapi.io";
+export const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 function App() {
   return (
