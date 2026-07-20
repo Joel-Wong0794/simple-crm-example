@@ -1,6 +1,20 @@
 import { useState } from "react";
 import { API_BASE } from "../App";
 import styles from "./AddInteractionForm.module.css";
+import * as yup from "yup";
+
+const interactionSchema = yup.object().shape({
+  type: yup.string().required("Interaction type is required"),
+  notes: yup
+    .string()
+    .required("Notes are required.")
+    .min(10, "Notes must be at least 10 characters."),
+  date: yup
+    .date()
+    .typeError("Date is required.")
+    .required("Date is required.")
+    .max(new Date(), "Date cannot be in the future."),
+});
 
 const EMPTY_FORM = {
   type: "call",
@@ -9,47 +23,48 @@ const EMPTY_FORM = {
 };
 
 function AddInteractionForm({ customerId, onSuccess }) {
-    const [formData, setFormData] = useState(EMPTY_FORM);
-    const [submitting, setSubmitting] = useState(false);
-    const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
 
-    function validateNotes(value) {
+  function validateNotes(value) {
     if (value.trim() === "") return "Notes are required!!";
-    if (value.trim().length < 10) return "Notes must be at least 10 characters.";
+    if (value.trim().length < 10)
+      return "Notes must be at least 10 characters.";
     return "";
+  }
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleBlur = async (e) => {
+    const { name, value } = e.target;
+    try {
+      await interactionSchema.validateAt(name, { ...formData, [name]: value });
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, [name]: err.message }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Collects error from yup
+    try {
+      await interactionSchema.validate(formData, { abortEarly: false });
+    } catch (err) {
+      const fieldErrors = {};
+
+      console.log(err.inner);
+      err.inner.forEach((validationError) => {
+        fieldErrors[validationError.path] = validationError.message;
+      });
+      setErrors(fieldErrors);
+      return;
     }
 
-    const handleChange = (e) => {
-        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleBlur = (e) => {
-        const { name, value } = e.target;
-        if (name === "notes") {
-            setErrors((prev) => ({ ...prev, notes: validateNotes(value) }));
-        } else if (name === "date" && !value) {
-            setErrors((prev) => ({ ...prev, date: "Date is required." }));
-        } else {
-            setErrors((prev) => ({ ...prev, [name]: "" })); // clear all errors
-    }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const notesError = validateNotes(formData.notes);
-        const dateError = formData.date ? "" : "Date is required.";
-
-        if (notesError || dateError) {
-            setErrors({ notes: notesError, date: dateError });
-            return;
-        }
-
-        if (!formData.date) {
-            setErrors({ date: "Date is required." });
-            return;
-        }
-
-        setSubmitting(true);
+    setSubmitting(true);
 
     try {
       const res = await fetch(`${API_BASE}/interactions`, {
