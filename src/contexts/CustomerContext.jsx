@@ -40,7 +40,7 @@ export function CustomerProvider({ children }) {
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
       const createdCustomer = await response.json();
       dispatch({ type: "ADD_CUSTOMER", payload: createdCustomer });
-      return createdCustomer; 
+      return createdCustomer;
     } catch (err) {
       dispatch({ type: "ADD_ERROR" });
       alert(`Failed to add customer: ${err.message}`);
@@ -52,7 +52,8 @@ export function CustomerProvider({ children }) {
   const updateCustomer = async (customerId, updates) => {
     try {
       const response = await fetch(`${API_BASE}/customers/${customerId}`, {
-        method: "PATCH",
+        // method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
       });

@@ -1,4 +1,4 @@
-import {lazy,Suspense} from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import WelcomePage from "./pages/WelcomePage";
 import RootLayout from "./layouts/RootLayout";
@@ -16,7 +16,8 @@ import Spinner from "./components/Spinner";
 // lazy loading
 const ProductsPage = lazy(() => import("./pages/ProductsPage"));
 
-export const API_BASE = "http://localhost:3001";
+// export const API_BASE = "http://localhost:3001";
+export const API_BASE = "https://6a5e1eaf98d9f02aed792592.mockapi.io";
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="app" element={<RootLayout />}>
             <Route index element={<DashboardPage />} />
-                        <Route
+            <Route
               path="products"
               element={
                 <Suspense fallback={<Spinner />}>
