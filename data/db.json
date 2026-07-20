@@ -1,4 +1,41 @@
 {
+  "interactions": [
+    {
+      "type": "email",
+      "notes": "exchanged email.",
+      "date": "2026-07-20",
+      "customerId": "PgQw-XQvOuE",
+      "id": "yBdPFMWOdyg"
+    },
+    {
+      "type": "call",
+      "notes": "test",
+      "date": "2026-07-20",
+      "customerId": "PgQw-XQvOuE",
+      "id": "jdJPyrX66ig"
+    },
+    {
+      "type": "call",
+      "notes": "a",
+      "date": "2026-07-20",
+      "customerId": "PgQw-XQvOuE",
+      "id": "FidyyQAPvUE"
+    },
+    {
+      "type": "call",
+      "notes": "a",
+      "date": "2026-07-20",
+      "customerId": "PgQw-XQvOuE",
+      "id": "Oz1X_LFH5kk"
+    },
+    {
+      "type": "call",
+      "notes": "12345678910",
+      "date": "2026-07-20",
+      "customerId": "PgQw-XQvOuE",
+      "id": "lh3KTRQpCZQ"
+    }
+  ],
   "customers": [
     {
       "id": "c2",

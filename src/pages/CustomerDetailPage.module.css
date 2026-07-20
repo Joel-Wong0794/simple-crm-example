@@ -151,3 +151,17 @@
 .deleteButton:hover {
   background: var(--danger-50, #f9eeed);
 }
+
+.interactionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.interactionList li {
+  font-size: var(--text-sm);
+  color: var(--text-body);
+  padding: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}

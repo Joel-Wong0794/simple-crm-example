@@ -5,6 +5,7 @@ import { API_BASE } from "../App";
 import Spinner from "../components/Spinner";
 import styles from "./CustomerDetailPage.module.css";
 import { CustomerContext } from "../contexts/CustomerContext";
+import AddInteractionForm from "../components/AddInteractionForm";
 
 function CustomerDetailPage() {
     const { id } = useParams();
@@ -12,6 +13,8 @@ function CustomerDetailPage() {
     const [customer, setCustomer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [interactions, setInteractions] = useState([]);
+
     const navigate = useNavigate();
     const { deleteCustomer } = useContext(CustomerContext);
     const handleDelete = async () => {
@@ -38,6 +41,15 @@ function CustomerDetailPage() {
     };
     fetchCustomer();
     }, [id]); // re-fetch whenever the id in the URL changes
+
+    useEffect(() => {
+    const fetchInteractions = async () => {
+        const response = await fetch(`${API_BASE}/interactions?customerId=${id}`);
+        const data = await response.json();
+        setInteractions(data);
+    };
+    fetchInteractions();
+    }, [id]); // re-fetch only when the id in the URL changes
 
     if (loading) {
     return (
@@ -108,12 +120,35 @@ function CustomerDetailPage() {
         )}
         </div>
 
+            <div className={styles.section}>
+            <p className={styles.sectionLabel}>Customer since</p>
+            <p className={styles.contactRow}>{customer.createdAt}</p>
+            <button className={styles.deleteButton} onClick={handleDelete}>
+            Delete Customer
+            </button>
+        </div>
+
+        <AddInteractionForm
+            customerId={id}
+            onSuccess={(savedInteraction) =>
+                setInteractions((prev) => [...prev, savedInteraction])
+            }
+        />
+
         <div className={styles.section}>
-        <p className={styles.sectionLabel}>Customer since</p>
-        <p className={styles.contactRow}>{customer.createdAt}</p>
-        <button className={styles.deleteButton} onClick={handleDelete}>
-        Delete Customer
-        </button>
+            <p className={styles.sectionLabel}>Interaction History</p>
+            {interactions.length === 0 ? (
+                <p className={styles.notesEmpty}>No interactions logged yet.</p>
+            ) : (
+                <ul className={styles.interactionList}>
+                {interactions.map((interaction) => (
+                    <li key={interaction.id}>
+                    <strong>{interaction.type}</strong> on {interaction.date}
+                    <p>{interaction.notes}</p>
+                    </li>
+                ))}
+                </ul>
+            )}
         </div>
     </div>
     );
